@@ -1,0 +1,11 @@
+releaser:
+    module_name: minchin.tasks
+    pypi_name: minchin.tasks
+    here: .
+    docs: none
+    test: none
+    source: minchin
+    changelog: CHANGELOG.rst
+    version: minchin/tasks/__init__.py
+    test_command: none
+    version_bump: none
