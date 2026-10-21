@@ -20,6 +20,6 @@ from __future__ import annotations
 from minchin.tasks.dev import check, format_code, lint, test, update, upgrade
 from minchin.tasks.pelican import build as pelican_build
 
-__version__ = "1.1.0"
+__version__ = "1.1.1-dev"
 
 __all__ = ["check", "format_code", "lint", "pelican_build", "test", "update", "upgrade"]
