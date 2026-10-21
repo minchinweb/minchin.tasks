@@ -1,6 +1,7 @@
 Changelog
 =========
 
+- :release:`1.1.1 <2026-10-22>`
 - :bug:`-` pass through color output for ``uv``
 - :release:`1.1.1 <2026-10-21>`
 - :bug:`-` pass through UTF-8 (i.e. Unicode)

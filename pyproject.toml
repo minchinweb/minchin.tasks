@@ -131,3 +131,23 @@ section-order = [
 [tool.ruff.lint.isort.sections]
 "django" = ["django"]
 "pelican" = ["pelican"]
+
+[tool.isort]
+# Only here because `minchin.releaser` calls the `isort` library directly
+# before a release; it doesn't read the ruff config. Keep in step with
+# `[tool.ruff.lint.isort]` above so the two tools agree.
+profile = "black"
+line_length = 88
+force_sort_within_sections = true
+known_first_party = ["minchin"]
+known_django = ["django"]
+known_pelican = ["pelican"]
+sections = [
+  "FUTURE",
+  "STDLIB",
+  "DJANGO",
+  "PELICAN",
+  "THIRDPARTY",
+  "FIRSTPARTY",
+  "LOCALFOLDER",
+]
