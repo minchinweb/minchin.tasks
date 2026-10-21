@@ -114,7 +114,7 @@ def upgrade(ctx, extra=None, all_=False, dry_run=False):
         )
     # pip-sync wants each file once; keep the order given
     files = dict.fromkeys(available[n].as_posix() for n in names)
-    ctx.run(f"pip-sync{flag} {' '.join(files)}", pty=False)
+    ctx.run(f"python -m piptools sync{flag} {' '.join(files)}", pty=False)
 
 
 @task
