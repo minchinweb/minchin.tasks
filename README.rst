@@ -1,4 +1,4 @@
-Minchin tasks
+Minchin.Tasks
 =============
 
 Common development tasks for use with `Invoke <https://www.pyinvoke.org/>`_.

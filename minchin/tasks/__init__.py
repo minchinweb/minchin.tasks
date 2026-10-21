@@ -19,6 +19,6 @@ from __future__ import annotations
 
 from minchin.tasks.dev import check, format_code, lint, test, update, upgrade
 
-__version__ = "0.1.0"
+__version__ = "1.0.0"
 
 __all__ = ["check", "format_code", "lint", "test", "update", "upgrade"]

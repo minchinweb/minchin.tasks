@@ -3,9 +3,12 @@ releaser:
     pypi_name: minchin.tasks
     here: .
     docs: none
-    test: none
+    test: minchin/tasks/tests
     source: minchin
     changelog: CHANGELOG.rst
     version: minchin/tasks/__init__.py
-    test_command: none
+    test_command: invoke test
     version_bump: none
+    extra_packages:
+        test:
+            - invoke
