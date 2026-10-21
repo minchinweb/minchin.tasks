@@ -40,6 +40,7 @@ classifiers = [
 dependencies = [
   "invoke >= 2.0.0",
   # for pyproject.toml format checks
+  "minchin-text>=7.0.0",
   "taplo",
   "validate-pyproject",
 ]

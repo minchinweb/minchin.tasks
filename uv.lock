@@ -920,6 +920,7 @@ name = "minchin-tasks"
 source = { editable = "." }
 dependencies = [
     { name = "invoke" },
+    { name = "minchin-text" },
     { name = "taplo" },
     { name = "validate-pyproject" },
 ]
@@ -938,6 +939,7 @@ release = [
 [package.metadata]
 requires-dist = [
     { name = "invoke", specifier = ">=2.0.0" },
+    { name = "minchin-text", specifier = ">=7.0.0" },
     { name = "taplo" },
     { name = "validate-pyproject" },
 ]
@@ -949,6 +951,18 @@ dev = [
     { name = "ruff", specifier = ">=0.14" },
 ]
 release = [{ name = "minchin-releaser", specifier = ">=0.9.6" }]
+
+[[package]]
+name = "minchin-text"
+version = "7.0.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "colorama" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/d7/25/3485653a25ac71e3f598350f4caa884ca366d0d22b224dc6e3994d6520e9/minchin_text-7.0.0.tar.gz", hash = "sha256:8b7791afe9ceebff03f6c44c51178e4d2ced0d72d72646b44ea566e3ae36190e", size = 12087, upload-time = "2025-10-25T05:17:33.217Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/91/89/208fcd4ef7edef644cbe5be6bd268367836d92054c3fb2f7885efb548c8c/minchin_text-7.0.0-py3-none-any.whl", hash = "sha256:9c7d247c982753b2d9ce515d71d8e5bc7ed108fffc41a4167b8ae585cefd984a", size = 9207, upload-time = "2025-10-25T05:17:51.441Z" },
+]
 
 [[package]]
 name = "more-itertools"

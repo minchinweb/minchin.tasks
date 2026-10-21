@@ -10,6 +10,8 @@ from pathlib import Path
 
 from invoke import task
 
+from minchin.text import title
+
 __all__ = ["check", "format_code", "lint", "test", "update", "upgrade"]
 
 
@@ -63,6 +65,8 @@ def update(ctx):
 
     Rewrites `uv.lock`, or recompiles pip-tools' `.txt`.
     """
+    title("Update python requirements to latest versions")
+
     if _uses_uv():
         ctx.run("uv lock --upgrade", pty=False)
         return
@@ -90,6 +94,10 @@ def upgrade(ctx, extra=None, all_=False, dry_run=False):
 
     Use `--dry-run` to check first.
     """
+    title(
+        "Upgrade python requirements to version specified in requirements files/uv.lock"
+    )
+
     flag = " --dry-run" if dry_run else ""
     if _uses_uv():
         ctx.run(f"uv sync{flag}", pty=False)
@@ -112,6 +120,8 @@ def upgrade(ctx, extra=None, all_=False, dry_run=False):
 @task
 def lint(ctx):
     """Check code, formatting and `pyproject.toml`."""
+    title("Check code formatting")
+
     run = _run_prefix()
     if _uses_black():
         ctx.run(f"{run}black --check .", pty=False)
@@ -133,6 +143,8 @@ def lint(ctx):
 @task(name="format")
 def format_code(ctx):
     """Apply safe lint fixes, import sorting and formatting (code and TOML)."""
+    title("Fix code formatting")
+
     if _uses_black():
         run = _run_prefix()
         ctx.run(f"{run}isort .", pty=False)
@@ -152,6 +164,7 @@ def test(ctx):
     Assumes `pytest`.
     """
     ctx.run(f"{_run_prefix()}pytest", pty=False)
+    title("Run test suite")
 
 
 @task(pre=[lint, test])
