@@ -5,10 +5,11 @@ Uses ``uv run`` under the hood by default, or ``pip-tools`` on "legacy" setups.
 
 from __future__ import annotations
 
-import sys
 from pathlib import Path
+import sys
 
 from invoke import task
+
 from minchin.text import title
 
 from ._run import utf8_run
@@ -60,8 +61,8 @@ def _run_prefix() -> str:
     return "uv run " if _uses_uv() else ""
 
 
-@task
-def update(ctx):
+@task(help={"color": "Colourize output (disable with `--no-color`)"})
+def update(ctx, color=True):
     """Refresh the requirements with the current versions.
 
     Rewrites `uv.lock`, or recompiles pip-tools' `.txt`.
@@ -69,7 +70,9 @@ def update(ctx):
     title("Update python requirements to latest versions")
 
     if _uses_uv():
-        utf8_run(ctx, "uv lock --upgrade", pty=False)
+        env = {"FORCE_COLOR": "1"} if color else {}  # for uv
+
+        utf8_run(ctx, "uv lock --upgrade", pty=False, env=env)
         return
     inputs = _pip_tools_inputs()
     if not inputs:
@@ -85,9 +88,10 @@ def update(ctx):
         "pip-tools projects only)",
         "all_": "Install every compiled requirements file (pip-tools only)",
         "dry_run": "Show what would change without installing anything",
+        "color": "Colourize output (disable with `--no-color`)",
     },
 )
-def upgrade(ctx, extra=None, all_=False, dry_run=False):
+def upgrade(ctx, extra=None, all_=False, color=True, dry_run=False):
     """Install based on the current requiremnts.
 
     Runs `uv sync`, or `python -m piptools sync` (so we can also upgrade
@@ -102,7 +106,9 @@ def upgrade(ctx, extra=None, all_=False, dry_run=False):
 
     flag = " --dry-run" if dry_run else ""
     if _uses_uv():
-        utf8_run(ctx, f"uv sync{flag}", pty=False)
+        env = {"FORCE_COLOR": "1"} if color else {}  # for uv
+
+        utf8_run(ctx, f"uv sync{flag}", pty=False, env=env)
         return
     available = _compiled_requirements()
     if not available:
@@ -119,7 +125,7 @@ def upgrade(ctx, extra=None, all_=False, dry_run=False):
     utf8_run(ctx, f"python -m piptools sync{flag} {' '.join(files)}", pty=False)
 
 
-@task
+@task(help={"color": "Colourize output (disable with `--no-color`)"})
 def lint(ctx, color=True):
     """Check code, formatting and `pyproject.toml`."""
     title("Check code formatting")
@@ -142,7 +148,9 @@ def lint(ctx, color=True):
     utf8_run(ctx, "uv run ruff check", pty=False, env=env)
     utf8_run(ctx, "uv run ruff format --check", pty=False, env=env)
     utf8_run(ctx, "uv run validate-pyproject pyproject.toml", pty=False)
-    utf8_run(ctx, f"uv run taplo format{taplo_color_cli} --check pyproject.toml", pty=False)
+    utf8_run(
+        ctx, f"uv run taplo format{taplo_color_cli} --check pyproject.toml", pty=False
+    )
 
 
 # named `format_code` so it doesn't shadow the builtin (ruff rule `A`)
