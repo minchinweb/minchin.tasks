@@ -5,11 +5,10 @@ Uses ``uv run`` under the hood by default, or ``pip-tools`` on "legacy" setups.
 
 from __future__ import annotations
 
-from pathlib import Path
 import sys
+from pathlib import Path
 
 from invoke import task
-
 from minchin.text import title
 
 __all__ = ["check", "format_code", "lint", "test", "update", "upgrade"]
