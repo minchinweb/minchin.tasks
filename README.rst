@@ -9,8 +9,8 @@ style, see https://github.com/minchinweb/python-style-guide
 In your ``tasks.py`` (import each for clarity)::
 
     from minchin.tasks import check, format_code, lint, test, update, upgrade  # noqa: F401
+    from minchin.tasks import pelican_build  # noqa: F401
 
-The tasks are defined in ``minchin.tasks.dev``; ``minchin.tasks`` re-exports them.
 
 This gives you:
 
@@ -20,3 +20,4 @@ This gives you:
 - ``invoke format`` -- fix formatting issues
 - ``invoke test`` -- run ``pytest``.
 - ``invoke check`` -- ``lint`` and ``test``.
+- ``invoke pelican-build`` -- build the local Pelican site
