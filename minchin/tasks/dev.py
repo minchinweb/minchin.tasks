@@ -11,6 +11,8 @@ from pathlib import Path
 from invoke import task
 from minchin.text import title
 
+from ._run import utf8_run
+
 __all__ = ["check", "format_code", "lint", "test", "update", "upgrade"]
 
 
@@ -67,13 +69,13 @@ def update(ctx):
     title("Update python requirements to latest versions")
 
     if _uses_uv():
-        ctx.run("uv lock --upgrade", pty=False)
+        utf8_run(ctx, "uv lock --upgrade", pty=False)
         return
     inputs = _pip_tools_inputs()
     if not inputs:
         raise SystemExit("No `uv.lock` or pip-tools `.in` files found.")
     for source in inputs:
-        ctx.run(f"pip-compile --upgrade {source.as_posix()}", pty=False)
+        utf8_run(ctx, f"pip-compile --upgrade {source.as_posix()}", pty=False)
 
 
 @task(
@@ -100,7 +102,7 @@ def upgrade(ctx, extra=None, all_=False, dry_run=False):
 
     flag = " --dry-run" if dry_run else ""
     if _uses_uv():
-        ctx.run(f"uv sync{flag}", pty=False)
+        utf8_run(ctx, f"uv sync{flag}", pty=False)
         return
     available = _compiled_requirements()
     if not available:
@@ -114,7 +116,7 @@ def upgrade(ctx, extra=None, all_=False, dry_run=False):
         )
     # pip-sync wants each file once; keep the order given
     files = dict.fromkeys(available[n].as_posix() for n in names)
-    ctx.run(f"python -m piptools sync{flag} {' '.join(files)}", pty=False)
+    utf8_run(ctx, f"python -m piptools sync{flag} {' '.join(files)}", pty=False)
 
 
 @task
@@ -122,10 +124,10 @@ def lint(ctx, color=True):
     """Check code, formatting and `pyproject.toml`."""
     title("Check code formatting")
 
-    run = _run_prefix()
+    prefix = _run_prefix()
     if _uses_black():
-        ctx.run(f"{run}black --check .", pty=False)
-        ctx.run(f"{run}isort --check-only .", pty=False)
+        utf8_run(ctx, f"{prefix}black --check .", pty=False)
+        utf8_run(ctx, f"{prefix}isort --check-only .", pty=False)
         print(
             "WARNING: pyproject.toml was not checked (validate-pyproject and "
             "taplo only run for ruff projects); review it by hand.",
@@ -137,10 +139,10 @@ def lint(ctx, color=True):
     env = {"FORCE_COLOR": "1"} if color else {}  # works for ruff
     taplo_color_cli = " --colors always" if color else " --colors never"
 
-    ctx.run("uv run ruff check", pty=False, env=env)
-    ctx.run("uv run ruff format --check", pty=False, env=env)
-    ctx.run("uv run validate-pyproject pyproject.toml", pty=False)
-    ctx.run(f"uv run taplo format{taplo_color_cli} --check pyproject.toml", pty=False)
+    utf8_run(ctx, "uv run ruff check", pty=False, env=env)
+    utf8_run(ctx, "uv run ruff format --check", pty=False, env=env)
+    utf8_run(ctx, "uv run validate-pyproject pyproject.toml", pty=False)
+    utf8_run(ctx, f"uv run taplo format{taplo_color_cli} --check pyproject.toml", pty=False)
 
 
 # named `format_code` so it doesn't shadow the builtin (ruff rule `A`)
@@ -156,9 +158,9 @@ def format_code(ctx, unsafe_fixes=False, color=True):
     title("Fix code formatting")
 
     if _uses_black():
-        run = _run_prefix()
-        ctx.run(f"{run}isort .", pty=False)
-        ctx.run(f"{run}black .", pty=False)
+        prefix = _run_prefix()
+        utf8_run(ctx, f"{prefix}isort .", pty=False)
+        utf8_run(ctx, f"{prefix}black .", pty=False)
         return
 
     # unfixable problems exit non-zero; still format, `lint` reports them
@@ -167,11 +169,15 @@ def format_code(ctx, unsafe_fixes=False, color=True):
     env = {"FORCE_COLOR": "1"} if color else {}  # works for ruff
     taplo_color_cli = "--colors always" if color else "--colors never"
 
-    ctx.run(
-        f"uv run ruff check --fix {unsafe_fixes_cli}", pty=False, warn=True, env=env
+    utf8_run(
+        ctx,
+        f"uv run ruff check --fix {unsafe_fixes_cli}",
+        pty=False,
+        warn=True,
+        env=env,
     )
-    ctx.run("uv run ruff format", pty=False, env=env)
-    ctx.run(f"uv run taplo format {taplo_color_cli} pyproject.toml", pty=False)
+    utf8_run(ctx, "uv run ruff format", pty=False, env=env)
+    utf8_run(ctx, f"uv run taplo format {taplo_color_cli} pyproject.toml", pty=False)
 
 
 @task(help={"color": "Colourize output (disable with `--no-color`)"})
@@ -184,7 +190,7 @@ def test(ctx, color=True):
 
     pytest_color_cli = "--color=yes" if color else "--color=no"
 
-    ctx.run(f"{_run_prefix()}pytest {pytest_color_cli}", pty=False)
+    utf8_run(ctx, f"{_run_prefix()}pytest {pytest_color_cli}", pty=False)
 
 
 # can't pass flags to "pre" tasks, so color is on by default

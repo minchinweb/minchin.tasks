@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from minchin.tasks import check, format_code, lint, test, update, upgrade  # noqa: F401
+from minchin.tasks import (check, format_code, lint, test,  # noqa: F401
+                           update, upgrade)
 
 try:
     from minchin.releaser import make_release  # noqa: F401

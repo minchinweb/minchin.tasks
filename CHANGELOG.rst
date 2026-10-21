@@ -1,6 +1,7 @@
 Changelog
 =========
 
+- :bug:`-` pass through UTF-8 (i.e. Unicode)
 - :release:`1.1.0 <2026-10-21>`
 - :feature:`-` add start of ``pelican`` set with ``build``
 - :bug:`- major` pass through color output
