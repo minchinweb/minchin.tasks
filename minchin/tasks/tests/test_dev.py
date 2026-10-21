@@ -35,17 +35,17 @@ def test_lint_changes_nothing_and_checks_pyproject():
         "uv run ruff check",
         "uv run ruff format --check",
         "uv run validate-pyproject pyproject.toml",
-        "uv run taplo format --check pyproject.toml",
+        "uv run taplo format --colors always --check pyproject.toml",
     ]
 
 
 def test_format_still_formats_when_lint_fixes_fail():
     commands = run_task(tasks.format_code)
-    assert commands[0][0] == "uv run ruff check --fix"
+    assert commands[0][0].rstrip() == "uv run ruff check --fix"
     assert commands[0][1]["warn"] is True
     assert [c for c, _ in commands[1:]] == [
         "uv run ruff format",
-        "uv run taplo format pyproject.toml",
+        "uv run taplo format --colors always pyproject.toml",
     ]
 
 

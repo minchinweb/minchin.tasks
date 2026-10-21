@@ -5,8 +5,8 @@ Uses ``uv run`` under the hood by default, or ``pip-tools`` on "legacy" setups.
 
 from __future__ import annotations
 
-import sys
 from pathlib import Path
+import sys
 
 from invoke import task
 
@@ -89,8 +89,9 @@ def update(ctx):
 def upgrade(ctx, extra=None, all_=False, dry_run=False):
     """Install based on the current requiremnts.
 
-    Runs `uv sync`, or `pip-sync` on the main compiled pip-tools file plus any
-    sets named with `--extra` (or all of them with `--all`).
+    Runs `uv sync`, or `python -m piptools sync` (so we can also upgrade
+    pip-tools) on the main compiled pip-tools file plus any sets named with
+    `--extra` (or all of them with `--all`).
 
     Use `--dry-run` to check first.
     """
@@ -118,7 +119,7 @@ def upgrade(ctx, extra=None, all_=False, dry_run=False):
 
 
 @task
-def lint(ctx):
+def lint(ctx, color=True):
     """Check code, formatting and `pyproject.toml`."""
     title("Check code formatting")
 
@@ -133,15 +134,25 @@ def lint(ctx):
         )
         return
 
-    ctx.run("uv run ruff check", pty=False)
-    ctx.run("uv run ruff format --check", pty=False)
+    # pass color through
+    env = {"FORCE_COLOR": "1"} if color else {}  # works for ruff
+    taplo_color_cli = " --colors always" if color else " --colors never"
+
+    ctx.run("uv run ruff check", pty=False, env=env)
+    ctx.run("uv run ruff format --check", pty=False, env=env)
     ctx.run("uv run validate-pyproject pyproject.toml", pty=False)
-    ctx.run("uv run taplo format --check pyproject.toml", pty=False)
+    ctx.run(f"uv run taplo format{taplo_color_cli} --check pyproject.toml", pty=False)
 
 
 # named `format_code` so it doesn't shadow the builtin (ruff rule `A`)
-@task(name="format")
-def format_code(ctx):
+@task(
+    name="format",
+    help={
+        "unsafe_fixes": "Apply `ruff`'s unsafe fixes",
+        "color": "Colourize output (disable with `--no-color`)",
+    },
+)
+def format_code(ctx, unsafe_fixes=False, color=True):
     """Apply safe lint fixes, import sorting and formatting (code and TOML)."""
     title("Fix code formatting")
 
@@ -152,21 +163,32 @@ def format_code(ctx):
         return
 
     # unfixable problems exit non-zero; still format, `lint` reports them
-    ctx.run("uv run ruff check --fix", pty=False, warn=True)
-    ctx.run("uv run ruff format", pty=False)
-    ctx.run("uv run taplo format pyproject.toml", pty=False)
+    unsafe_fixes_cli = "--unsafe-fixes" if unsafe_fixes else ""
+    # pass color through
+    env = {"FORCE_COLOR": "1"} if color else {}  # works for ruff
+    taplo_color_cli = "--colors always" if color else "--colors never"
+
+    ctx.run(
+        f"uv run ruff check --fix {unsafe_fixes_cli}", pty=False, warn=True, env=env
+    )
+    ctx.run("uv run ruff format", pty=False, env=env)
+    ctx.run(f"uv run taplo format {taplo_color_cli} pyproject.toml", pty=False)
 
 
-@task
-def test(ctx):
+@task(help={"color": "Colourize output (disable with `--no-color`)"})
+def test(ctx, color=True):
     """Run the test suite.
 
     Assumes `pytest`.
     """
-    ctx.run(f"{_run_prefix()}pytest", pty=False)
     title("Run test suite")
 
+    pytest_color_cli = "--color=yes" if color else "--color=no"
 
+    ctx.run(f"{_run_prefix()}pytest {pytest_color_cli}", pty=False)
+
+
+# can't pass flags to "pre" tasks, so color is on by default
 @task(pre=[lint, test])
 def check(ctx):
     """lint, formatting and tests.
