@@ -52,7 +52,12 @@ Changelog = "https://github.com/MinchinWeb/minchin.tasks/blob/master/CHANGELOG.r
 
 [dependency-groups]
 # PEP 735; not published. `uv sync` installs `dev` by default.
-dev = ["pytest >= 8", "ruff >= 0.14", { include-group = "release" }]
+dev = [
+  "pytest >= 8",
+  "ruff >= 0.14",
+  "taplo",  # also needed for Github actions
+  { include-group = "release" },
+]
 release = ["minchin.releaser >= 0.9.6"]
 
 [tool.setuptools.packages.find]

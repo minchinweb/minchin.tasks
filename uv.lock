@@ -931,6 +931,7 @@ dev = [
     { name = "pytest", version = "8.4.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10'" },
     { name = "pytest", version = "9.1.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10'" },
     { name = "ruff" },
+    { name = "taplo" },
 ]
 release = [
     { name = "minchin-releaser" },
@@ -949,6 +950,7 @@ dev = [
     { name = "minchin-releaser", specifier = ">=0.9.6" },
     { name = "pytest", specifier = ">=8" },
     { name = "ruff", specifier = ">=0.14" },
+    { name = "taplo" },
 ]
 release = [{ name = "minchin-releaser", specifier = ">=0.9.6" }]
 
