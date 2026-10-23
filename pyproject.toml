@@ -84,6 +84,10 @@ readme = { file = ["README.rst"], content-type = "text/x-rst" }
 
 [tool.pytest.ini_options]
 addopts = ["--import-mode=importlib"]
+# `minchin` is a namespace package shared with other distributions
+# (`minchin.text`, `minchin.releaser`); without this, pytest's importlib mode
+# builds a `minchin` that only sees this repo and `import minchin.text` fails
+consider_namespace_packages = true
 # tests ship inside the package: minchin/<name>/tests/
 testpaths = ["minchin"]
 

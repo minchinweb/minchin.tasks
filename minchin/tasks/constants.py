@@ -3,7 +3,7 @@
 import colorama
 
 __title__ = "minchin.tasks"
-__version__ = "1.1.3-dev"
+__version__ = "1.2.0"
 __description__ = "Minchin.Tasks is a collection of development related invoke tasks."
 __author__ = "William Minchin"
 __email__ = "w_minchin@hotmail.com"

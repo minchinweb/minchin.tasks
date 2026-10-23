@@ -1,6 +1,7 @@
 Changelog
 =========
 
+- :release:`1.2.0 <2026-10-22>`
 - :feature:`1` allow a custom test command via ``minchin_tasks.test_command``
   in ``invoke.yaml``
 - :release:`1.1.1 <2026-10-22>`
