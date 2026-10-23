@@ -1,6 +1,8 @@
 Changelog
 =========
 
+- :feature:`1` allow a custom test command via ``minchin_tasks.test_command``
+  in ``invoke.yaml``
 - :release:`1.1.1 <2026-10-22>`
 - :bug:`-` pass through color output for ``uv``
 - :release:`1.1.1 <2026-10-21>`

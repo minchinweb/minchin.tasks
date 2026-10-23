@@ -20,13 +20,24 @@ class RecordingContext(Context):
 
 def run_task(task):
     ctx = RecordingContext()
-    task(ctx)
+    task(ctx, skip_header=False)
     return ctx.commands
 
 
 def test_update_and_upgrade_mirror_apt():
     assert run_task(tasks.update)[0][0] == "uv lock --upgrade"
     assert run_task(tasks.upgrade)[0][0] == "uv sync"
+
+
+def test_test_runs_pytest_by_default():
+    assert run_task(tasks.test)[0][0] == "uv run pytest --color=yes"
+
+
+def test_test_command_is_configurable():
+    ctx = RecordingContext()
+    ctx.config.minchin_tasks = {"test_command": "battlestation test app --noinput"}
+    tasks.test(ctx, skip_header=True)
+    assert ctx.commands[0][0] == "battlestation test app --noinput"
 
 
 def test_lint_changes_nothing_and_checks_pyproject():

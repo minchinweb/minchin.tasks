@@ -6,7 +6,7 @@ releaser:
   test: minchin/tasks/tests
   source: minchin
   changelog: CHANGELOG.rst
-  version: minchin/tasks/__init__.py
+  version: minchin/tasks/constants.py
   test_command: invoke test
   version_bump: none
   extra_packages:
@@ -15,3 +15,5 @@ releaser:
       - taplo
       - validate-pyproject
       - setuptools
+minchin_tasks:
+  test_command: none  # defaults to pytest

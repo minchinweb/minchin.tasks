@@ -8,13 +8,17 @@ from __future__ import annotations
 from pathlib import Path
 import sys
 
-from invoke import task
+import colorama
+from invoke.tasks import task
 
 from minchin.text import title
 
 from ._run import utf8_run
+from .constants import RESET_COLOR, WARNING_COLOR
 
 __all__ = ["check", "format_code", "lint", "test", "update", "upgrade"]
+
+DEFAULT_TEST_COMMAND = "pytest"
 
 
 def _uses_uv() -> bool:
@@ -62,12 +66,14 @@ def _run_prefix() -> str:
 
 
 @task(help={"color": "Colourize output (disable with `--no-color`)"})
-def update(ctx, color=True):
+def update(ctx, color=True, skip_header=False):
     """Refresh the requirements with the current versions.
 
     Rewrites `uv.lock`, or recompiles pip-tools' `.txt`.
     """
-    title("Update python requirements to latest versions")
+    if not skip_header:
+        colorama.init()
+        title("Update python requirements to latest versions")
 
     if _uses_uv():
         env = {"FORCE_COLOR": "1"} if color else {}  # for uv
@@ -91,7 +97,7 @@ def update(ctx, color=True):
         "color": "Colourize output (disable with `--no-color`)",
     },
 )
-def upgrade(ctx, extra=None, all_=False, color=True, dry_run=False):
+def upgrade(ctx, extra=None, all_=False, color=True, dry_run=False, skip_header=False):
     """Install based on the current requiremnts.
 
     Runs `uv sync`, or `python -m piptools sync` (so we can also upgrade
@@ -100,9 +106,12 @@ def upgrade(ctx, extra=None, all_=False, color=True, dry_run=False):
 
     Use `--dry-run` to check first.
     """
-    title(
-        "Upgrade python requirements to version specified in requirements files/uv.lock"
-    )
+    if not skip_header:
+        colorama.init()
+        title(
+            "Upgrade python requirements to version specified in "
+            "requirements files/uv.lock"
+        )
 
     flag = " --dry-run" if dry_run else ""
     if _uses_uv():
@@ -126,9 +135,11 @@ def upgrade(ctx, extra=None, all_=False, color=True, dry_run=False):
 
 
 @task(help={"color": "Colourize output (disable with `--no-color`)"})
-def lint(ctx, color=True):
+def lint(ctx, color=True, skip_header=False):
     """Check code, formatting and `pyproject.toml`."""
-    title("Check code formatting")
+    if not skip_header:
+        colorama.init()
+        title("Check code formatting")
 
     prefix = _run_prefix()
     if _uses_black():
@@ -161,9 +172,11 @@ def lint(ctx, color=True):
         "color": "Colourize output (disable with `--no-color`)",
     },
 )
-def format_code(ctx, unsafe_fixes=False, color=True):
+def format_code(ctx, unsafe_fixes=False, color=True, skip_header=False):
     """Apply safe lint fixes, import sorting and formatting (code and TOML)."""
-    title("Fix code formatting")
+    if not skip_header:
+        colorama.init()
+        title("Fix code formatting")
 
     if _uses_black():
         prefix = _run_prefix()
@@ -189,16 +202,43 @@ def format_code(ctx, unsafe_fixes=False, color=True):
 
 
 @task(help={"color": "Colourize output (disable with `--no-color`)"})
-def test(ctx, color=True):
+def test(ctx, color=True, skip_header=False):
     """Run the test suite.
 
-    Assumes `pytest`.
+    Runs `pytest`, unless `tasks.test_command` is set (e.g. in `invoke.yaml`).
     """
-    title("Run test suite")
+    colorama.init()
 
-    pytest_color_cli = "--color=yes" if color else "--color=no"
+    if not skip_header:
+        title("Run test suite")
 
-    utf8_run(ctx, f"{_run_prefix()}pytest {pytest_color_cli}", pty=False)
+    try:
+        command = ctx.minchin_tasks.test_command
+    except AttributeError:
+        try:
+            command = ctx.releaser.test_command
+        except AttributeError:
+            command = DEFAULT_TEST_COMMAND
+        else:
+            if command.startswith(("inv ", "invoke ")):
+                command = DEFAULT_TEST_COMMAND
+                print(
+                    "[{}WARN{}] Cannot use `minchin.releaser`'s "  # noqa: UP032
+                    "`test_command` as it calls `invoke` (recursion is "
+                    "bad...). Defaulting to `{}`, consider setting "
+                    "`tasks.test_command`.".format(WARNING_COLOR, RESET_COLOR, command)
+                )
+    if (
+        command is None
+        or str(command).lower() == "none"
+        or command == DEFAULT_TEST_COMMAND
+    ):
+        command = (
+            f"{_run_prefix()}{DEFAULT_TEST_COMMAND} "
+            f"{'--color=yes' if color else '--color=no'}"
+        )
+
+    utf8_run(ctx, f"{command}", pty=False)
 
 
 # can't pass flags to "pre" tasks, so color is on by default

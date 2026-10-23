@@ -919,6 +919,7 @@ wheels = [
 name = "minchin-tasks"
 source = { editable = "." }
 dependencies = [
+    { name = "colorama" },
     { name = "invoke" },
     { name = "minchin-text" },
     { name = "taplo" },
@@ -939,6 +940,7 @@ release = [
 
 [package.metadata]
 requires-dist = [
+    { name = "colorama", specifier = ">=0.4.6" },
     { name = "invoke", specifier = ">=2.0.0" },
     { name = "minchin-text", specifier = ">=7.0.0" },
     { name = "taplo" },

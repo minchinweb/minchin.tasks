@@ -18,6 +18,17 @@ This gives you:
 - ``invoke upgrade`` -- install the locked requirements
 - ``invoke lint`` -- report only format check, including ``pyproject.toml``
 - ``invoke format`` -- fix formatting issues
-- ``invoke test`` -- run ``pytest``.
+- ``invoke test`` -- runs ``pytest`` by default, or the command set in
+  ``minchin_tasks.test_command`` in ``invoke.yaml``. A custom command is run as
+  written: prefix it with ``uv run`` and add (no) color explicitly if needed.
+  If unset, ``releaser.test_command`` is used, unless it starts with ``inv``
+  (i.e. *invoke*).
 - ``invoke check`` -- ``lint`` and ``test``.
 - ``invoke pelican-build`` -- build the local Pelican site
+
+
+Sample ``invoke.yaml`` configuration::
+
+  # invoke.yaml
+  minchin_tasks:
+    test_command: uv run battlestation test app --keepdb --noinput --color=always
